@@ -23,3 +23,9 @@ new Bot ('1df7f07400be0ec3b797fa6bc12d2f98fb79990a639bfc0d671c14b9793ab4e4c96fbf
 new Command(/^(?:бот)$/i, async (message, answer) => {
     return answer(`Ok`);
 }, 123456789);
+
+`Logging adding to chats`
+```node
+const { Bot } = require("user-bot");
+let bot = new Bot ('1df7f07400be0ec3b797fa6bc12d2f98fb79990a639bfc0d671c14b9793ab4e4c96fbf7f027ae82d6af94', 123456789);
+bot.loggerConversation(false); // true - leaves the chat
