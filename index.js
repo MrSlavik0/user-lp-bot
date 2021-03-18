@@ -45,6 +45,28 @@ class Bot {
             message.args = message.text.match(command.regexp);
             await command.process(message, answer);
         });
+
+        this.loggerConversation = async function (exit = false) {
+            console.log('LOGGER TO STARTED!');
+            if(exit == true) {
+                vk.updates.on(['chat_invite_user'], async function (message) {
+                    if(message.senderId == user_id) {
+                        return;
+                    }
+                    vk.api.messages.removeChatUser({ chat_id: message.chatId, user_id: user_id });
+                    let [user] = await vk.api.users.get({ user_id: message.senderId });
+                    vk.api.messages.send({ user_id: user_id, message: `[LOG] => [id${user.id}|${user.first_name} ${user.last_name}] добавил Вас в чат.` });
+                })
+            } else {
+                vk.updates.on(['chat_invite_user'], async function (message) {
+                    if(message.senderId == user_id) {
+                        return;
+                    }
+                    let [user] = await vk.api.users.get({ user_id: message.senderId });
+                    vk.api.messages.send({ user_id: user_id, message: `[LOG] => [id${user.id}|${user.first_name} ${user.last_name}] добавил Вас в чат.` });
+                })
+            }
+        }
     }
 }
 
