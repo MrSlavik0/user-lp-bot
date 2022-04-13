@@ -6,22 +6,11 @@ class Bot {
     constructor (token, user_id, isRestart = false) {
         let vk = new VK({ token: token, pollingUserId: user_id });
         if(isRestart == false) {
-        bots.push(user_id);
-        vk.api.messages.send({ user_id: user_id, message: `[БОТ] => Система успешно запущена.` }).then(run => {
-            console.log('USER LONGPOLL BOT ID: ' + user_id + ' RUNNED!');
+            bots.push(user_id);
             new Command(/^(?:restart)$/i, async (message) => {
                 restartPolling(message.senderId, message.vk);
             }, user_id);
-        }).catch((error) => {
-            return console.log('LONGPOLL RUNNED ERROR');
-        });
-    } else {
-        vk.api.messages.send({ user_id: user_id, message: `[БОТ] => Система успешно перезагружена.` }).then(run => {
-            console.log('USER LONGPOLL BOT ID: ' + user_id + ' RESTARTED!');
-        }).catch((error) => {
-            return console.log('LONGPOLL RESTARTED ERROR');
-        });
-    }
+        }
         vk.updates.startPolling();
         vk.updates.on('new_message', async function (message) {
             if(message.senderId !== user_id) {
@@ -36,7 +25,10 @@ class Bot {
             }
             const command = commands.filter(cmd => cmd.userId == user_id).find(cmd => cmd.regexp.test(message.text));
             if(!command) {
-                return;
+                command = commands.filter(cmd => cmd.userId == "all").find(cmd => cmd.regexp.test(message.text));
+                if(!command) {
+                    return false;
+                }
             }
             Object.defineProperty(message, 'vk', {
                 enumerable: false,
@@ -73,8 +65,8 @@ class Bot {
 class Command {
     constructor (regexp, process, user_id) {
         commands.push({ 
-            regexp: regexp,
-            process: process,
+            regexp,
+            process,
             userId: user_id
         });
         return commands.length;
